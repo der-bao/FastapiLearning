@@ -59,6 +59,9 @@ create table {table_name} (
     - DEFAULT : 默认值
     - FOREIGN KEY : 外键，用于与其他表关联，保证引用的数据必须存在（如评论表里的 user_id 必须在用户表里的id存在）。
 
+# 查看当前数据库有哪些表
+show tables;
+
 # 查看表的结构 describe
 desc {table_name}
 
@@ -83,7 +86,7 @@ insert into {tb_name} (field1,field2,...) values(val1,val2,...),(val1,val2,...) 
 ## 查询所有数据
 select * from {tb_name}; 
 ## 条件查询
-select {field1,...} from {tb_name} where     
+select {field1,...} from {tb_name} where   
 SELECT name, age FROM user WHERE age > ?
 
 # 改 UPDATE
