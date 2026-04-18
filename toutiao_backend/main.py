@@ -16,6 +16,6 @@ app.include_router(news.router)
 
 @app.get("/")
 def read_root():
-    return {"Hello": "World"}
+    return {"Hello": "World"}   
 
 
