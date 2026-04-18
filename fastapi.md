@@ -316,3 +316,24 @@ app = FastAPI(lifespan=lifespan)
 ```
 
 ```
+
+
+
+# 三、项目相关知识
+## 1. 模块化路由
+```
+from fastapi import APIRouter
+
+# 1. 创建一个APIRouter实例
+router = APIRouter(prefix="/api/news", tags=["news"])
+
+# 2. 路由处理函数
+
+@router.get("/categories")
+async def get_categories():
+    return {"msg": "获取新闻分类成功"}
+
+# 3. 在main文件中导入并注册路由
+from routers import news  # 导入news模块的路由
+app.include_router(news.router) # 注册news模块的路由
+```
