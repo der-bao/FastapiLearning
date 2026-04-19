@@ -105,3 +105,5 @@ mysqldump -u root -p {db_name} {tb_name} > {path/db.sql}   # {tb_name}省略则�
 # 导入
 mysql -u root -p {db_name} < {path/db.sql}
 ```
+
+## 4. 索引
