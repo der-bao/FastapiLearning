@@ -8,6 +8,7 @@ uv run uvicorn main:app --reload
 
 from fastapi import FastAPI
 from routers import news  # 导入news模块的路由
+from routers import users  # 导入users模块的路由
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
@@ -32,6 +33,9 @@ app.add_middleware(
 
 # 注册news模块的路由
 app.include_router(news.router)
+
+# 注册users模块的路由
+app.include_router(users.router)
 
 @app.get("/")
 def read_root():
