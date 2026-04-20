@@ -25,12 +25,13 @@ async def register(user_data: UserRequest, db: AsyncSession = Depends(get_db)):
     user = await users.create_user(db, user_data) 
 
     # 生成访问令牌
+    token = await users.create_token(db, user.id)
     
     return{
         "code": 200,
         "msg": "注册成功",
         "data": {
-            "token": "用户访问令牌",
+            "token": token,
             "userInfo": {
                 "id": user.id,
                 "username": user.username,
