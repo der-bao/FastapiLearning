@@ -6,6 +6,8 @@ from config.db_config import get_db
 
 from schemas.users import UserRequest   #  引入用户请求模型，参数类型
 from crud import users
+from utils.response import success_response
+from schemas.users import UserAuthResponse, UsersInfoResponse
 
 from fastapi import HTTPException
 from starlette import status
@@ -20,23 +22,22 @@ async def register(user_data: UserRequest, db: AsyncSession = Depends(get_db)):
     existing_user = await users.get_user_by_username(db, user_data.username)  # 查询用户是否存在
     if existing_user:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="用户已存在")
-    
     # 创建用户
     user = await users.create_user(db, user_data) 
-
     # 生成访问令牌
     token = await users.create_token(db, user.id)
-    
-    return{
-        "code": 200,
-        "msg": "注册成功",
-        "data": {
-            "token": token,
-            "userInfo": {
-                "id": user.id,
-                "username": user.username,
-                "bio": user.bio,
-                "avatar": user.avatar
-            }
-        }
-    }
+    # return{
+    #     "code": 200,
+    #     "msg": "注册成功",
+    #     "data": {
+    #         "token": token,
+    #         "userInfo": {
+    #             "id": user.id,
+    #             "username": user.username,
+    #             "bio": user.bio,
+    #             "avatar": user.avatar
+    #         }
+    #     }
+    # }
+    response_data = UserAuthResponse(token=token, user_info=UsersInfoResponse.model_validate(user))  # 直接传递ORM对象，Pydantic会自动转换
+    return success_response(message="注册成功", data=response_data)
