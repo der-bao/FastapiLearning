@@ -39,3 +39,18 @@ class UserAuthResponse(BaseModel):
         # 允许从对象属性获取数据，适用于ORM对象
         from_attributes=True
     )
+
+# 更新用户信息的模型类
+class UserUpdateRequest(UserInfoBase):
+    nickname: str = None
+    avatar: str = None
+    gender: str = None
+    bio: str = None
+    phone: str = None
+
+# 修改密码请求模型
+class UserChangePasswordRequest(BaseModel):
+    old_password: str = Field(..., description="旧密码", alias="oldPassword")
+    new_password: str = Field(..., description="新密码", alias="newPassword", min_length=6) 
+
+

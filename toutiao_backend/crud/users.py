@@ -7,10 +7,12 @@ from sqlalchemy import update
 
 
 from models.users import User, UserToken
-from schemas.users import UserRequest
+from schemas.users import UserRequest, UserUpdateRequest
 
 from utils import security
 
+from fastapi import HTTPException
+from starlette import status
 
 # 根据用户名名查询数据库
 async def get_user_by_username(db: AsyncSession, username: str):
@@ -56,3 +58,58 @@ async def create_token(db: AsyncSession, user_id: int):
     await db.commit()  # 提交事务
     return token
 
+# 验证用户登录信息，返回用户对象或None
+async def authenticate_user(db: AsyncSession, username: str, password: str):
+    user = await get_user_by_username(db, username)
+    # 验证用户是否存在和密码是否正确
+    if not user:
+        return None
+    if not security.verify_password(password, user.password):  
+        # user.password是数据库中存储的哈希密码
+        return None
+    return user
+
+# 根据token查询用户信息
+async def get_user_by_token(db: AsyncSession, token: str):
+    # 查询token对应的用户
+    stmt = select(UserToken).where(UserToken.token == token, UserToken.expires_at > datetime.now())
+    result = await db.execute(stmt)
+    db_token = result.scalar_one_or_none()  # 获取单个结果，如果没有则返回None
+
+    if not db_token:
+        return None
+    
+    query = select(User).where(User.id == db_token.user_id)
+    result = await db.execute(query)
+    return result.scalar_one_or_none()
+
+# 更新用户信息
+async def update_user_info(db: AsyncSession, user_data: UserUpdateRequest, username: str):
+    # user_data是一个Pydantic模型实例，先转换为字典，排除 ,然后再解构
+    query = update(User).where(User.username == username).values(**user_data.model_dump(
+        exclude_unset=True,     # 只包含用户提供的字段
+        exclude_none=True       # 排除值为None的字段
+    ))
+    result = await db.execute(query)
+    await db.commit()  # 提交事务
+
+    # 检查更新
+    if result.rowcount == 0:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="用户未找到")
+    return await get_user_by_username(db, username)  # 返回更新后的用户信息
+
+    # 获取更新后的用户信息
+    updated_user = await get_user_by_username(db, username)
+    return updated_user
+
+# 修改密码: 验证旧密码 -> 新密码加密 -> 修改密码 
+async def change_password(db: AsyncSession, user: User, old_password: str, new_password: str):
+    # 验证旧密码是否正确
+    if not security.verify_password(old_password, user.password):  
+        return False
+    # 新密码加密
+    hashed_new_password = security.get_hash_password(new_password)
+    user.password = hashed_new_password
+    await db.commit()  # 提交事务
+    await db.refresh(user)  # 刷新对象以获取最新信息
+    return True
