@@ -11,6 +11,8 @@ from routers import news  # 导入news模块的路由
 from routers import users  # 导入users模块的路由
 from fastapi.middleware.cors import CORSMiddleware
 
+from utils.exception_handlers import register_exception_handler
+
 app = FastAPI()
 
 """
@@ -30,6 +32,9 @@ app.add_middleware(
     allow_methods=["*"],        # 允许所有HTTP方法
     allow_headers=["*"],        # 允许所有HTTP头
 )
+
+# 注册全局异常处理器
+register_exception_handler(app)
 
 # 注册news模块的路由
 app.include_router(news.router)
