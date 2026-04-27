@@ -1,19 +1,25 @@
-from fastapi import APIRouter
-
+# === 1. 第三方库 / 核心框架组件 ===
+from fastapi import APIRouter, Depends, HTTPException
+from starlette import status
 from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi import Depends
-from config.db_config import get_db
 
-from schemas.users import UserRequest   #  引入用户请求模型，参数类型
-from crud import users
-from utils.response import success_response
-from schemas.users import UserAuthResponse, UsersInfoResponse, UserUpdateRequest, UserChangePasswordRequest 
-                                                                                   
-from utils.auth import get_current_user 
+# === 2. 数据库配置与 ORM 模型 ===
+from config.db_config import get_db
 from models.users import User
 
-from fastapi import HTTPException
-from starlette import status
+# === 3. Pydantic 数据验证模型 (Schemas) ===
+from schemas.users import (
+    UserRequest,                 # 用户请求模型 (如登录/注册参数)
+    UserAuthResponse,            # 认证响应模型
+    UsersInfoResponse,           # 用户信息响应模型
+    UserUpdateRequest,           # 用户更新请求模型
+    UserChangePasswordRequest    # 修改密码请求模型
+)
+
+# === 4. 业务逻辑 (CRUD 操作) 与 工具类 ===
+from crud import users
+from utils.response import success_response
+from utils.auth import get_current_user
 
 
 router = APIRouter(prefix="/api/user", tags=["users"])
