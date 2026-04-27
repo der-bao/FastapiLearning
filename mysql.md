@@ -107,3 +107,5 @@ mysql -u root -p {db_name} < {path/db.sql}
 ```
 
 ## 4. 索引
+
+## 5. 唯一约束
