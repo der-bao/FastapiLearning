@@ -10,6 +10,7 @@ from fastapi import FastAPI
 from routers import news  # 导入news模块的路由
 from routers import users  # 导入users模块的路由
 from routers import favorite  # 导入favorite模块的路由
+from routers import history  # 导入history模块的路由
 from fastapi.middleware.cors import CORSMiddleware
 
 from utils.exception_handlers import register_exception_handler
@@ -45,6 +46,9 @@ app.include_router(users.router)
 
 # 注册favorite模块的路由
 app.include_router(favorite.router)
+
+# 注册history模块的路由
+app.include_router(history.router)
 
 @app.get("/")
 def read_root():

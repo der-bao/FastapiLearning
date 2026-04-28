@@ -1,10 +1,8 @@
-from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, update, delete
 
 from models.favorite import Favorite
 from models.news import News 
-from config.db_config import get_db
 
 # 查看指定的新闻是否被当前用户收藏
 async def is_news_favorite(
@@ -51,12 +49,13 @@ async def get_favorite_list(
     # 查询收藏列表 - 联表查询 join() + 排序功能(时间) + 分页功能
     """
     # 联表查询
-    - 语法: select(查询主体模型类, 字段别名).join(联合查询的模型类, 联合查询的条件)
+    - 语法: select(查询主体模型类, 添加的联合查询模型的字段).join(联合查询的模型类, 联合查询的条件)
     - 查询主体模型类: 代表查询结果中每一行数据的模型类，这里是News，因为我们最终要返回新闻列表
     - 联合查询的模型类: 代表我们要联合查询的模型类，这里是Favorite，因为我们要根据收藏记录来**筛选**新闻
     - News和Favorite中有重复的字段,通过取别名避免冲突。如: Favorite.created_at.label("favorite_time")
     """
-    query = (select(News, Favorite.created_at.label("favorite_time"), Favorite.id.label("favorite_id"))
+            # 查询主体模型类是News，联合查询模型类是Favorite，并且取别名避免字段冲突，返回元组(新闻对象, 收藏时间, 收藏ID)
+    query = (select(News, Favorite.created_at.label("favorite_time"), Favorite.id.label("favorite_id"))     
             .join(Favorite, Favorite.news_id == News.id)    # 联表查询，连接条件: Favorite.news_id == News.id
             .where(Favorite.user_id == user_id)             # 根据用户ID筛选收藏记录
             .order_by(Favorite.created_at.desc())           # 根据收藏时间降序排序
@@ -74,7 +73,7 @@ async def get_favorite_list(
         ...
     ]
     """
-    rows = result.all()                 # 获取所有查询结果
+    rows = result.all() # 获取所有查询结果
     return rows, total  # 返回查询结果列表和总收藏数
     
 
