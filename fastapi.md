@@ -77,6 +77,10 @@ def read_book(book_id: int = Path(...,description="The ID of the book to retriev
 
 ### 3.2 查询参数
 
+附加在 URL 路径的末尾，跟在问号 `?` 之后，多个参数用 `&` 隔开。键值对形式。
+
+
+
 Query() 和 Path() 类似
 
 ### 3.3 请求体参数
