@@ -55,14 +55,14 @@ async def get_history_list(
     return success_response(message="查询历史记录成功", data=data)
 
 
-@router.delete("/delete/{news_id}")     # delete请求方法，路径参数
+@router.delete("/delete/{history_id}")     # delete请求方法，查询参数
 async def delete_history(
-    news_id: int,
+    history_id: int,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
     # 逻辑：进入请求 → 验证用户是否登录 → 删除历史记录 → 响应结果
-    is_deleted = await delete_news_history(db, news_id, user.id)
+    is_deleted = await delete_news_history(db, history_id, user.id)
     if not is_deleted:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="历史记录不存在")
     return success_response(message="删除历史记录成功")

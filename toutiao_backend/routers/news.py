@@ -17,6 +17,7 @@ from fastapi import HTTPException
 
 from config.db_config import get_db
 from crud import news
+from crud import news_cache
 
 # 创建一个APIRouter实例
 router = APIRouter(prefix="/api/news", tags=["news"])
@@ -30,7 +31,7 @@ async def get_categories(
     skip: int = 0, limit: int = 100, 
     db: AsyncSession = Depends(get_db)
     ):
-    categories = await news.get_categories(db=db, skip=skip, limit=limit)  # 调用crud封装好的方法获取数据
+    categories = await news_cache.get_categories(db=db, skip=skip, limit=limit)  # 调用crud封装好的方法获取数据
     return {
         "code": 200,
         "msg": "获取新闻分类成功",
@@ -47,7 +48,7 @@ async def get_news_list(
     skip = (page - 1) * page_size  # 计算分页的偏移量
 
     # 获取指定分类的新闻列表
-    news_list = await news.get_news_list(db=db, category_id=category_id, skip=skip, limit=page_size)  # 调用crud封装好的方法获取数据
+    news_list = await news_cache.get_news_list(db=db, category_id=category_id, skip=skip, limit=page_size)  # 调用crud封装好的方法获取数据
     # 获取指定分类新闻的总数
     total = await news.get_news_count(db=db, category_id=category_id)
     
