@@ -66,3 +66,13 @@ async def delete_news_history(
     result = await db.execute(stmt)
     await db.commit()
     return result.rowcount > 0  # 返回是否成功删除了记录
+
+# 清空指定用户的所有浏览记录
+async def clear_all_history(
+    db: AsyncSession,
+    user_id: int
+):
+    stmt = delete(History).where(History.user_id == user_id)
+    result = await db.execute(stmt)
+    await db.commit()
+    return result.rowcount > 0  # 返回是否成功删除了记录

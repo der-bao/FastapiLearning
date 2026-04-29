@@ -12,7 +12,8 @@ from config.db_config import get_db
 from schemas.history import HistoryAddRequest, HistoryListResponse
 
 # === 4. 业务逻辑 (CRUD 操作) 与 工具类 ===
-from crud.history import add_news_history, get_news_history_list, delete_news_history
+from crud.history import (add_news_history, get_news_history_list, 
+                          delete_news_history, clear_all_history)
 
 from utils.auth import get_current_user
 from utils.response import success_response
@@ -65,3 +66,12 @@ async def delete_history(
     if not is_deleted:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="历史记录不存在")
     return success_response(message="删除历史记录成功")
+
+@router.delete("/clear")     # delete请求方法，无参数
+async def clear_history(
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    # 逻辑：进入请求 → 验证用户是否登录 → 删除所有历史记录 → 响应结果
+    count = await clear_all_history(db, user.id)  # 删除所有历史记录，返回删除的记录数
+    return success_response(message=f"清空了{count}条历史记录")
