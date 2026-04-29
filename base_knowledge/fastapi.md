@@ -343,3 +343,10 @@ async def get_categories():
 from routers import news  # 导入news模块的路由
 app.include_router(news.router) # 注册news模块的路由
 ```
+
+## 2、跨域
+
+## 3、封装异常处理和响应
+
+## 4、ORM
+
